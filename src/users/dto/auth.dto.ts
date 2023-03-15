@@ -9,7 +9,7 @@ export class LogInData {
   @IsString()
   password: string;
 }
-export class RegisterData {
+export class dataOfNewUser {
   @IsNotEmpty()
   @IsString()
   gmail: string;
