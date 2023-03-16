@@ -1,10 +1,12 @@
-import { Controller, Post, Get } from '@nestjs/common';
+import { Controller, Post, Get, Param } from '@nestjs/common';
+import { CartService } from './cart.service';
 
 @Controller('cart')
 export class CartController {
-  @Get('/')
-  getCartOfUser() {
-    return 'cart of the user';
+  constructor(private readonly cartService: CartService) {}
+  @Get('/:id')
+  getCartOfUser(@Param('id') idUser: string) {
+    return this.cartService.getCartByIdOfUser(idUser);
   }
   @Post('/')
   sendEmailToUser() {

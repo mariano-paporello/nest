@@ -1,22 +1,48 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { dataOfNewUser, LogInData } from './dto/auth.dto';
+import { AddUserObject, dataOfNewUser, UserObject } from './dto/auth.dto';
 import { UsersDocument } from './dto/users.schema';
+import byCript from 'bcrypt';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel('users') private UserModel: Model<UsersDocument>) {}
-  async buscarUsuario(id: string) {
-    return await this.UserModel.findById(id);
+  async findById(id: string) {
+    const user = await this.UserModel.findById(id);
+    return user;
   }
-  async crearUsuario(data: dataOfNewUser) {
-    return await this.UserModel.create(data);
+
+  async find(usernameIngresed: string): Promise<UserObject[] | null> {
+    console.log(usernameIngresed);
+    const userfound = await this.UserModel.find({ username: usernameIngresed });
+    if (userfound.length === 0) {
+      return null;
+    }
+    return userfound;
   }
-  async logInOfUser(dataDeLogIn: LogInData) {
-    return `reviso si esxiste un usuario con la misma data: ${dataDeLogIn.username} y lo devuelvo como usuario de la session`;
+
+  async logIn(username: string, password: string) {
+    const candidatePassword = password;
+    const usersfound: UserObject[] | null = await this.find(username);
+    if (usersfound != null && usersfound.length > 0) {
+      for (let i = 0; i <= usersfound.length; i++) {
+        const logUser = await byCript.compare(
+          candidatePassword,
+          usersfound[i].password,
+        );
+        if (logUser) {
+          return usersfound[i];
+        } else {
+          return null;
+        }
+      }
+    } else {
+      return null;
+    }
   }
-  async logOut() {
-    return 'destruyo la session del usuario';
+  async singUp(data: dataOfNewUser) {
+    const newUser = await this.UserModel.create(data);
+    return newUser;
   }
 }

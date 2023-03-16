@@ -7,17 +7,17 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
   @Post('/logIn')
   logIn(@Body() data: LogInData) {
-    return this.usersService.logInOfUser(data);
+    return this.usersService.logIn(data.username, data.password);
   }
 
   @Post('/register')
   register(@Body() data: dataOfNewUser) {
-    return this.usersService.crearUsuario(data);
+    return this.usersService.singUp(data);
   }
 
   @Get('/logout')
   logout() {
-    return this.usersService.logOut();
+    return 'culo';
   }
 
   @Get('/profile')
